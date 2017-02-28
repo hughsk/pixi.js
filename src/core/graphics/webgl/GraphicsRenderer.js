@@ -86,7 +86,7 @@ export default class GraphicsRenderer extends ObjectRenderer
         }
 
         // This  could be speeded up for sure!
-        const shader = this.primitiveShader;
+        const shader = graphics.shader || this.primitiveShader;
 
         renderer.bindShader(shader);
         renderer.state.setBlendMode(graphics.blendMode);
@@ -94,7 +94,7 @@ export default class GraphicsRenderer extends ObjectRenderer
         for (let i = 0, n = webGL.data.length; i < n; i++)
         {
             webGLData = webGL.data[i];
-            const shaderTemp = webGLData.shader;
+            const shaderTemp = graphics.shader || webGLData.shader;
 
             renderer.bindShader(shaderTemp);
             shaderTemp.uniforms.translationMatrix = graphics.transform.worldTransform.toArray(true);
@@ -102,7 +102,10 @@ export default class GraphicsRenderer extends ObjectRenderer
             shaderTemp.uniforms.alpha = graphics.worldAlpha;
 
             renderer.bindVao(webGLData.vao);
-            webGLData.vao.draw(gl.TRIANGLE_STRIP, webGLData.indices.length);
+            webGLData.vao.draw(gl.TRIANGLE_STRIP, typeof graphics.elementCount === 'undefined'
+              ? webGLData.indices.length
+              : graphics.elementCount
+            );
         }
     }
 
